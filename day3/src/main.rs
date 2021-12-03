@@ -23,34 +23,20 @@ fn bit_counts(bitstrings: &[Vec<u32>]) -> Vec<(u32, u32)> {
 }
 
 fn part1(bitstrings: &Vec<Vec<u32>>) {
-    let counts = bit_counts(&bitstrings);
+    let mut gamma = 0;
+    let mut epsilon = 0;
 
-    let most_zeroes = |c: &(u32, u32)| if c.0 > c.1 { 0 } else { 1 };
-    let most_ones = |c: &(u32, u32)| if c.1 > c.0 { 0 } else { 1 };
-    let to_int = |num: u32, b: u32| num * 2 + b;
-
-    let gamma = counts.iter().map(most_zeroes).fold(0, to_int);
-    let epsilon = counts.iter().map(most_ones).fold(0, to_int);
+    for (zeroes, ones) in bit_counts(&bitstrings).iter() {
+        let add_gamma = zeroes > ones;
+        gamma = gamma << 1 | add_gamma as u32;
+        epsilon = epsilon << 1 | !add_gamma as u32;
+    }
 
     println!("gamma x epsilon: {}", gamma * epsilon);
 }
 
-fn most_bits(bits: (u32, u32)) -> u32 {
-    if bits.1 >= bits.0 {
-        1
-    }
-    else {
-        0
-    }
-}
-
-fn least_bits(bits: (u32, u32)) -> u32 {
-    if bits.1 >= bits.0 {
-        0
-    }
-    else {
-        1
-    }
+fn filter_bit(bits: (u32, u32)) -> u32 {
+    (bits.1 >= bits.0) as u32
 }
 
 fn bitstring_to_num(bitstring: &Vec<u32>) -> u32 {
@@ -60,7 +46,7 @@ fn bitstring_to_num(bitstring: &Vec<u32>) -> u32 {
 fn part2(bitstrings: &Vec<Vec<u32>>) {
     let mut possibles: Vec<_> = bitstrings.clone();
     for row in 0..bitstrings[0].len() {
-        let f = most_bits(bit_count(&possibles, row));
+        let f = filter_bit(bit_count(&possibles, row));
         possibles.retain(|e| e[row] == f);
         if possibles.len() == 1 {
             break;
@@ -70,8 +56,8 @@ fn part2(bitstrings: &Vec<Vec<u32>>) {
 
     let mut possibles: Vec<_> = bitstrings.clone();
     for row in 0..bitstrings[0].len() {
-        let f = least_bits(bit_count(&possibles, row));
-        possibles.retain(|e| e[row] == f);
+        let f = filter_bit(bit_count(&possibles, row));
+        possibles.retain(|e| e[row] != f);
         if possibles.len() == 1 {
             break;
         }
