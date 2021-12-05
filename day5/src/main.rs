@@ -18,14 +18,12 @@ fn solution(input: &str, include_part2: bool) -> usize {
 
         if y1 == y2 { // horizontal
             for x in i32::min(x1, x2)..=i32::max(x1, x2) {
-                let r = coords.entry((x, y1)).or_insert(0);
-                *r += 1
+                coords.entry((x, y1)).and_modify(|r| *r += 1).or_insert(0);
             }
         }
         else if x1 == x2 { // vertical
             for y in i32::min(y1, y2)..=i32::max(y1, y2) {
-                let r = coords.entry((x1, y)).or_insert(0);
-                *r += 1
+                coords.entry((x1, y)).and_modify(|r| *r += 1).or_insert(0);
             }
         }
         else { // diagonal
@@ -35,8 +33,7 @@ fn solution(input: &str, include_part2: bool) -> usize {
                 let mut coord = (x1, y1);
 
                 for _ in i32::min(x1, x2)..=i32::max(x1, x2) {
-                    let r = coords.entry(coord).or_insert(0);
-                    *r += 1;
+                    coords.entry(coord).and_modify(|r| *r += 1).or_insert(0);
                     coord = (coord.0 + dx, coord.1 + dy);
                 }
             }
